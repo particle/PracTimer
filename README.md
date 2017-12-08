@@ -15,3 +15,9 @@ reuse, you can easily bookmark that time and reuse it.
 The default time is 5 minutes, which is the time allotted for 
 Lightning Talks.
 
+# Contributors
+
+
+[https://github.com/gregoa](@gregoa) corrected my spelling
+
+
