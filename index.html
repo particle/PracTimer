@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html> 
     <head>
-        <title> TimerID </title>
+        <title> PracTimer </title>
         <meta charset="UTF-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta name="description" content="TimerID is a Timer built using Vanilla Javascript, HTML5 and CSS.">
+        <meta name="description" content="PracTimer is a Timer built using Vanilla Javascript, HTML5 and CSS.">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <style>
             body {
@@ -155,11 +155,11 @@ function parse_time ( entry ) {
     return x ;
     }
 
-    // Audio Vars
-    var context = new AudioContext() ;
-    var freq = 880 ;
-    var wave = 'square';
-    var tone = new Tone( context , freq , wave ) ;
+    // // Audio Vars
+    // var context = new AudioContext() ;
+    // var freq = 880 ;
+    // var wave = 'square';
+    // var tone = new Tone( context , freq , wave ) ;
 
     // Timer Vars
     var looper ;
@@ -204,13 +204,13 @@ function timer () {
     hopper -= 1 ;
     if ( hopper < 0 ) {
         window.clearInterval(looper);
-        tone.start();
-        setTimeout( function () { tone.stop() } , 500 ) ;
+        //tone.start();
+        //setTimeout( function () { tone.stop() } , 500 ) ;
         console.log('done');
         }
     else if ( hopper < 10 ) {
-        tone.start();
-        setTimeout( function () { tone.stop() } , 50 ) ;
+        //tone.start();
+        //setTimeout( function () { tone.stop() } , 50 ) ;
         document.getElementById("numbers").className = "";
         document.getElementById("numbers").className = "min1";
         }
