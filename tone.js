@@ -13,7 +13,7 @@ Tone.prototype.setup = function() {
   this.osc.type = "sine";
   this.osc.frequency.setValueAtTime( this.freq , this.context.currentTime ) ; 
   this.gainNode = this.context.createGain();
-  this.gainNode.gain.setValueAtTime( 0.5, this.context.currentTime ) ; 
+  this.gainNode.gain.setValueAtTime( 1, this.context.currentTime ) ; 
   this.filter = this.context.createBiquadFilter();
   this.osc.connect(this.gainNode);
   this.gainNode.connect(this.filter);
