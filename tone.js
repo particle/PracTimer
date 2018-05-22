@@ -1,6 +1,7 @@
+// Next goal: pull this into index.html
+
 // create a Tone class
 function Tone(context, freq = 440, wave = "sine") {
-  // console.log( freq,wave) ;
   this.context = context;
   this.status = 0;
   this.freq = freq || 440;

@@ -178,6 +178,7 @@
         var AudioContext = window.AudioContext || window.webkitAudioContext || false;
         if (AudioContext) {
             var context = new AudioContext;
+            context.resume() ;
             var tone = new Tone(context, freq, wave);
         }
 
@@ -238,9 +239,11 @@
                     console.log('done');
                 } else if (hopper < 10) {
                     if (AudioContext) {
-                    tone.start();
-                    setTimeout( function () { tone.stop() } , 50 ) ;
-                }
+                        tone.start();
+                        setTimeout(function () {
+                            tone.stop()
+                        }, 50);
+                    }
                     document.getElementById("numbers").className = "";
                     document.getElementById("numbers").className = "min1";
                 } else {
@@ -249,6 +252,7 @@
                 }
             }, 1000);
         }
+
     </script>
 </body>
 
