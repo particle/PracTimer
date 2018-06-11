@@ -13,7 +13,7 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        #numbers {
+        #numbers, #type {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 35vw;
             font-weight: 900;
@@ -29,14 +29,19 @@
             -webkit-text-stroke-width: 1vh; */
             width: 100%;
             z-index: 0;
-        }
-
-        #numbers.min5 {
             color: #fff;
         }
 
-        #numbers.min1 {
-            color: #f22;
+        /*  red/green colorblind safe pallete
+        --  http://colorbrewer2.org/#type=sequential&scheme=YlOrRd&n=3 */
+        #numbers.talk, #type.talk {
+            background-color: #ffeda0;
+        }
+        #numbers.hint, #type.hint {
+            background-color: #feb24c;
+        }
+        #numbers.wrap, #type.wrap {
+            background-color: #f03b20;
         }
 
         #header {
@@ -139,10 +144,39 @@
             </div>
         </div>
     </div>
-    <div id="numbers" class="min5"> </div>
+    <div id="type" class="talk"> </div>
+    <div id="numbers" class="talk"> </div>
 
     <script src="./tone.js"></script>
     <script>
+        function parse_mark(phrase) {
+            let type = null;
+            let value = null;
+
+            if(type == null && value == null) {
+                let pair = phrase.match( /(?:(talk|hint|wrap)[=])?(.+)/ );
+                if (typeof pair && pair != null && pair.length == 3) {
+                    value = pair[2];
+                    if (pair[1] == null) {
+                        type = "talk";
+                    }
+                    else {
+                        type = pair[1];
+                    }
+                }
+            }
+
+            let minsec = parse_time(value);
+            let m = {
+                'phrase':   phrase,
+                'type':     type,
+                'value':    value,
+                'minsec':   minsec,
+                'seconds':  minsec[0] * 60 + minsec[1],
+            };
+            return m;
+        }
+
         function parse_time(entry) {
             let minutes = 0;
             let seconds = 0;
@@ -202,38 +236,53 @@
         }
 
         // Timer Vars
-        var looper;
-        var target;
-        var hopper;
-        var number = 5;
+        var looper;             //  looping function
+        var hopper;             //  timer length        (seconds)
+        var target;             //  timer end time      (milliseconds)
+        var timetalk = 5 * 60;  //  timer default time  (seconds)
         var d = new Date;
         init();
 
         // Allows for quick change
-        window.onhashchange = function () {
-            init()
-        };
+        window.onhashchange = function () { init(); };
+
+        function gen_tone(len) {
+            if (AudioContext) { tone.start(); setTimeout(function () { tone.stop() }, len); }
+        }
 
         // starts timer
         function init() {
             var hash = location.hash;
+//console.log("init: hash: ", hash);
+            var delim = ',';
+            var marks = [];
+
             if (hash != '#about') {
-                let minsec = [];
-                if (hash.length === 0) {
-                    hopper = 5 * 60;
-                } else {
-                    minsec = parse_time(hash);
-                    hopper = minsec[0] * 60 + minsec[1];
+                if (hash.length === 0) {    //  set default
+                    hopper = timetalk;
                 }
-                location.hash = [minsec[0], 'm', minsec[1], 's'].join('');
-                document.getElementById("close").href = location.hash;
-                target = d.getTime() + (1000 * 60 * number);
-                timer();
+                else {                    //  parse user input
+                    var hashval = hash.substr(1, hash.length);
+                    var hasharray = hashval.split(delim);
+                    for (i = 0; i < hasharray.length; i++) {
+                        marks.push( parse_mark( hasharray[i] ) );
+                    }
+                }
+                marks.push( {phrase: '', type: 'fin', value: '0s', minsec: [0,0], seconds: 0} );
+                hopper = marks[0].seconds;
+                target = d.getTime() + (1000 * hopper);
+                document.getElementById("type").className = "";
+                document.getElementById("type").className = type;
+                document.getElementById("numbers").className = "";
+                document.getElementById("numbers").className = "talk";
+                timer(marks);
             }
         }
 
         // handles timer
-        function timer() {
+        function timer(marks) {
+            var m = 1;
+            var type = 'talk';
             if (looper) {
                 window.clearInterval(looper)
             }
@@ -243,32 +292,28 @@
                 if (seconds < 10) {
                     seconds = '0' + seconds;
                 }
-                // console.log([hopper, minutes, seconds].join(' '));
+//console.log("timer: ", [hopper, minutes, seconds].join(' '));
                 var time = [minutes, seconds].join(':');
+                document.getElementById("type").innerHTML = "<p>" + type + "</p>";
                 document.getElementById("numbers").innerHTML = time;
                 hopper -= 1;
                 if (hopper < 0) {
                     window.clearInterval(looper);
-                    if (AudioContext) {
-                        tone.start();
-                        setTimeout(function () {
-                            tone.stop()
-                        }, 500);
-                    }
-                    console.log('done');
-                } else if (hopper < 10) {
-                    if (AudioContext) {
-                        tone.start();
-                        setTimeout(function () {
-                            tone.stop()
-                        }, 50);
-                    }
-                    document.getElementById("numbers").className = "";
-                    document.getElementById("numbers").className = "min1";
-                } else {
-                    document.getElementById("numbers").className = "";
-                    document.getElementById("numbers").className = "min5";
+//                    gen_tone(500);
+//console.log("timer: ", 'done');
                 }
+                else {
+                    if (type == 'wrap') {
+//                        gen_tone(50);
+                    }
+                    document.getElementById("type").className = "";
+                    document.getElementById("type").className = type;
+                    document.getElementById("numbers").className = "";
+                    document.getElementById("numbers").className = type;
+                }
+                if (hopper == marks[m].seconds) { m += 1; }
+//console.log("timer: mark: ", marks[m], type);
+                type = marks[m-1].type;
             }, 1000);
         }
     </script>
